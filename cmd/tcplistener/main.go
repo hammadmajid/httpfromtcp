@@ -19,16 +19,18 @@ func main() {
 		}
 	}(listener)
 
-	conn, err := listener.Accept()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Listening on " + conn.RemoteAddr().String())
+	for {
+		conn, err := listener.Accept()
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Listening on " + conn.RemoteAddr().String())
 
-	lines := getLinesChannel(conn)
+		lines := getLinesChannel(conn)
 
-	for line := range lines {
-		fmt.Printf("%s\n", line)
+		for line := range lines {
+			fmt.Printf("%s\n", line)
+		}
 	}
 }
 
