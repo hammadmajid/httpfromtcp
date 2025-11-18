@@ -12,7 +12,12 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(file)
 
 	lines := getLinesChannel(file)
 
@@ -25,8 +30,9 @@ func getLinesChannel(f io.ReadCloser) <-chan string {
 	linesCh := make(chan string)
 
 	go func() {
-		var buffer string
+		defer close(linesCh)
 
+		var buffer string
 		for {
 			var current string
 
@@ -48,8 +54,6 @@ func getLinesChannel(f io.ReadCloser) <-chan string {
 				buffer += current
 			}
 		}
-
-		close(linesCh)
 	}()
 
 	return linesCh
